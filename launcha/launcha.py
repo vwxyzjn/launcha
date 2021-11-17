@@ -6,10 +6,18 @@ from distutils.util import strtobool
 import boto3
 import requests
 import wandb
+import launcha
+import os
+import shutil
 
 def parse_args():
     # fmt: off
-    parser = argparse.ArgumentParser(description='CleanRL Experiment Submission')
+    parser = argparse.ArgumentParser(description='Launcha CLI')
+    subparsers = parser.add_subparsers(dest='subcommand')
+    init = subparsers.add_parser('init', help='initialize the terraform template in the current folder')
+    
+    parser.add_argument('-d', '--docker-tag', type=str, default="vwxyzjn/cleanrl:latest",
+        help='the name of the docker tag')
     parser.add_argument('--command', type=str, default="poetry run python cleanrl/ppo.py",
         help='the docker command')
 
@@ -20,8 +28,6 @@ def parse_args():
     # AWS Batch args for experiment submission
     parser.add_argument('--job-queue', type=str, default="m6gd-medium",
         help='the name of the job queue')
-    parser.add_argument('--docker-tag', type=str, default="vwxyzjn/cleanrl:latest",
-        help='the name of the docker tag')
     parser.add_argument('--num-vcpu', type=int, default=1,
         help='number of vcpu per experiment')
     parser.add_argument('--num-memory', type=int, default=2000,
@@ -46,6 +52,16 @@ def parse_args():
 
 def main():
     args = parse_args()
+    if args.subcommand == "init":
+        shutil.copytree(os.path.join(launcha.__path__[0], 'template'), ".", dirs_exist_ok=True)
+        print("""
+Terraform template files initialized. Spin up the AWS computing environments by running:
+`terraform init`
+`terraform apply`
+The computing environments' setup is free of charge. You will only be billed when you submit jobs.
+        """)
+        return
+
     if args.build:
         output_type_str = "--output=type=registry" if args.push else "--output=type=docker"
         subprocess.run(
