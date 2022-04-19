@@ -36,7 +36,7 @@ def parse_args():
         help='number of memory (MB) per experiment')
     parser.add_argument('--num-gpu', type=int, default=0,
         help='number of gpu per experiment')
-    parser.add_argument('--num-hours', type=float, default=16.0,
+    parser.add_argument('--num-hours', type=float, default=120.0,
         help='number of hours allocated experiment')
     parser.add_argument('-b', '--build', type=lambda x:bool(strtobool(x)), default=False, nargs='?', const=True,
         help='if toggled, the script will build a container')
