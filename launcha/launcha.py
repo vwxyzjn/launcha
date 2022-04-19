@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 import subprocess
 import time
 from distutils.util import strtobool
@@ -6,9 +8,9 @@ from distutils.util import strtobool
 import boto3
 import requests
 import wandb
+
 import launcha
-import os
-import shutil
+
 
 def parse_args():
     # fmt: off
@@ -50,16 +52,19 @@ def parse_args():
     # fmt: on
     return args
 
+
 def main():
     args = parse_args()
     if args.subcommand == "init":
-        shutil.copytree(os.path.join(launcha.__path__[0], 'template'), ".", dirs_exist_ok=True)
-        print("""
+        shutil.copytree(os.path.join(launcha.__path__[0], "template"), ".", dirs_exist_ok=True)
+        print(
+            """
 Terraform template files initialized. Spin up the AWS computing environments by running:
 `terraform init`
 `terraform apply`
 The computing environments' setup is free of charge. You will only be billed when you submit jobs.
-        """)
+        """
+        )
         return
 
     if args.build:
@@ -81,7 +86,7 @@ The computing environments' setup is free of charge. You will only be billed whe
 
     for final_run_cmd in final_run_cmds:
         run_command = (
-            f'docker run -d -e WANDB_API_KEY={args.wandb_key} {args.docker_tag} '
+            f"docker run -d -e WANDB_API_KEY={args.wandb_key} {args.docker_tag} "
             + '/bin/bash -c "'
             + final_run_cmd
             + '"'
@@ -125,8 +130,8 @@ The computing environments' setup is free of charge. You will only be billed whe
                         "command": ["/bin/bash", "-c", final_run_cmd],
                         "environment": [
                             {"name": "WANDB_API_KEY", "value": args.wandb_key},
-                            {'name': 'WANDB_RESUME', 'value': 'allow'},
-                            {'name': 'WANDB_RUN_ID', 'value': wandb.util.generate_id()},
+                            {"name": "WANDB_RESUME", "value": "allow"},
+                            {"name": "WANDB_RUN_ID", "value": wandb.util.generate_id()},
                         ],
                         "resourceRequirements": resources_requirements,
                     },

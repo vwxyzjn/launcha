@@ -11,6 +11,7 @@ boto3 = "^1.20.7"
 wandb = "^0.12.6"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^2.18.1"
 
 [tool.poetry.scripts]
 launcha = "launcha.launcha:main"
